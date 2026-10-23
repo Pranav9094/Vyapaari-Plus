@@ -3,6 +3,8 @@ from datetime import datetime, timezone
 
 from sqlalchemy import (
     CheckConstraint,
+    UniqueConstraint,
+    Index,
     String,
     Integer,
     Float,
@@ -10,7 +12,6 @@ from sqlalchemy import (
     Enum,
     ForeignKey,
     Text,
-    Index,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -19,7 +20,7 @@ from app.db.mixins import TimestampMixin
 
 
 def utc_now() -> datetime:
-    """Return a timezone-aware UTC timestamp."""
+    """Return the current timezone-aware UTC timestamp."""
     return datetime.now(timezone.utc)
 
 
@@ -44,43 +45,94 @@ class Branch(Base, TimestampMixin):
     )
     address: Mapped[str | None] = mapped_column(Text, nullable=True)
     gstin: Mapped[str | None] = mapped_column(String(15), nullable=True)
-    is_warehouse: Mapped[bool] = mapped_column(default=False, nullable=False)
+    is_warehouse: Mapped[bool] = mapped_column(
+        default=False,
+        nullable=False,
+    )
+
+
+class StoreLocations(Base, TimestampMixin):
+    """Physical store or warehouse location associated with a branch."""
+
+    __tablename__ = "store_locations"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+
+    branch_id: Mapped[str] = mapped_column(
+        ForeignKey("branches.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+
+    location_code: Mapped[str] = mapped_column(
+        String(30),
+        unique=True,
+        nullable=False,
+    )
+
+    location_name: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+    )
+
+    address: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    is_active: Mapped[bool] = mapped_column(
+        default=True,
+        nullable=False,
+    )
 
 
 class StockBatch(Base, TimestampMixin):
     __tablename__ = "stock_batches"
 
     __table_args__ = (
-        Index("ix_stock_batches_branch_product", "branch_id", "product_id"),
-        Index("ix_stock_batches_batch_number", "batch_number"),
+        Index(
+            "ix_stock_batches_branch_product",
+            "branch_id",
+            "product_id",
+        ),
+        Index(
+            "ix_stock_batches_batch_number",
+            "batch_number",
+        ),
     )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
+
     product_id: Mapped[str] = mapped_column(
         String(36),
-        index=True,
         nullable=False,
     )
+
     branch_id: Mapped[str] = mapped_column(
-        ForeignKey("branches.id"),
+        ForeignKey("branches.id", ondelete="RESTRICT"),
         nullable=False,
     )
-    batch_number: Mapped[str] = mapped_column(String(50), nullable=False)
+
+    batch_number: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+    )
+
     quantity: Mapped[int] = mapped_column(
         Integer,
         default=0,
         nullable=False,
     )
+
     purchase_price: Mapped[float] = mapped_column(
         Float,
         default=0.0,
         nullable=False,
     )
+
     selling_price: Mapped[float] = mapped_column(
         Float,
         default=0.0,
         nullable=False,
     )
+
     expiry_date: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
         nullable=True,
@@ -103,15 +155,23 @@ class StockTransfer(Base, TimestampMixin):
             "destination_branch_id",
             "status",
         ),
-        Index("ix_stock_transfers_dispatched_at", "dispatched_at"),
-        # Transfer history list and dashboard: filter by status, newest first.
+        Index(
+            "ix_stock_transfers_dispatched_at",
+            "dispatched_at",
+        ),
         Index(
             "ix_stock_transfers_status_created",
             "status",
             "created_at",
         ),
-        Index("ix_stock_transfers_created_at", "created_at"),
-        Index("ix_stock_transfers_received_at", "received_at"),
+        Index(
+            "ix_stock_transfers_created_at",
+            "created_at",
+        ),
+        Index(
+            "ix_stock_transfers_received_at",
+            "received_at",
+        ),
         CheckConstraint(
             "source_branch_id <> destination_branch_id",
             name="ck_stock_transfers_distinct_branches",
@@ -127,7 +187,12 @@ class StockTransfer(Base, TimestampMixin):
         nullable=False,
     )
 
-    # A branch that has transfers can never be deleted.
+    gate_pass_number: Mapped[str | None] = mapped_column(
+        String(50),
+        unique=True,
+        nullable=True,
+    )
+
     source_branch_id: Mapped[str] = mapped_column(
         ForeignKey("branches.id", ondelete="RESTRICT"),
         nullable=False,
@@ -175,20 +240,12 @@ class StockTransfer(Base, TimestampMixin):
         nullable=True,
     )
 
-    # Delivery documents
     delivery_challan_number: Mapped[str | None] = mapped_column(
         String(50),
         unique=True,
         nullable=True,
     )
 
-    gate_pass_number: Mapped[str | None] = mapped_column(
-        String(50),
-        unique=True,
-        nullable=True,
-    )
-
-    # Carrier and delivery tracking
     carrier_name: Mapped[str | None] = mapped_column(
         String(100),
         nullable=True,
@@ -204,7 +261,10 @@ class StockTransfer(Base, TimestampMixin):
         nullable=True,
     )
 
-    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    notes: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
 
     items: Mapped[list["TransferItem"]] = relationship(
         "TransferItem",
@@ -233,7 +293,10 @@ class TransferItem(Base, TimestampMixin):
     __tablename__ = "transfer_items"
 
     __table_args__ = (
-        Index("ix_transfer_items_transfer_id", "transfer_id"),
+        Index(
+            "ix_transfer_items_transfer_id",
+            "transfer_id",
+        ),
         Index(
             "ix_transfer_items_product_batch",
             "product_id",
@@ -263,14 +326,13 @@ class TransferItem(Base, TimestampMixin):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
 
-    # Items are owned by their transfer (matches the ORM delete cascade).
     transfer_id: Mapped[str] = mapped_column(
         ForeignKey("stock_transfers.id", ondelete="CASCADE"),
         nullable=False,
     )
 
-    # No FK: the products module has no table yet. Add
-    # ForeignKey("products.id") here once it does.
+    # No product foreign key because the product table may be defined
+    # separately in the application's products module.
     product_id: Mapped[str] = mapped_column(
         String(36),
         nullable=False,
@@ -297,6 +359,12 @@ class TransferItem(Base, TimestampMixin):
         nullable=False,
     )
 
+    quantity_damaged: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
+
     unit_cost: Mapped[float] = mapped_column(
         Float,
         default=0.0,
@@ -307,12 +375,6 @@ class TransferItem(Base, TimestampMixin):
         "StockTransfer",
         back_populates="items",
     )
-    
-    quantity_damaged: Mapped[int] = mapped_column(
-        Integer,
-        default=0,
-        nullable=False,
-    )
 
 
 class ReconciliationLog(Base, TimestampMixin):
@@ -321,13 +383,15 @@ class ReconciliationLog(Base, TimestampMixin):
     __tablename__ = "reconciliation_logs"
 
     __table_args__ = (
-        # Dispute queue: PENDING logs, newest first.
         Index(
             "ix_reconciliation_logs_status_reconciled_at",
             "resolution_status",
             "reconciled_at",
         ),
-        Index("ix_reconciliation_logs_reconciled_by", "reconciled_by"),
+        Index(
+            "ix_reconciliation_logs_reconciled_by",
+            "reconciled_by",
+        ),
         CheckConstraint(
             "resolution_status IN ('PENDING', 'RESOLVED')",
             name="ck_reconciliation_logs_resolution_status",
@@ -336,7 +400,6 @@ class ReconciliationLog(Base, TimestampMixin):
             "total_dispatched_units >= 0 AND total_received_units >= 0",
             name="ck_reconciliation_logs_units_non_negative",
         ),
-        # Variance = dispatched - good received, enforced by the database.
         CheckConstraint(
             "variance_units = total_dispatched_units - total_received_units",
             name="ck_reconciliation_logs_variance_formula",
@@ -349,7 +412,6 @@ class ReconciliationLog(Base, TimestampMixin):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
 
-    # unique=True keeps exactly one log per transfer (and indexes it).
     transfer_id: Mapped[str] = mapped_column(
         ForeignKey("stock_transfers.id", ondelete="CASCADE"),
         unique=True,
@@ -396,16 +458,16 @@ class ReconciliationLog(Base, TimestampMixin):
         nullable=False,
     )
 
-    remarks: Mapped[str | None] = mapped_column(Text, nullable=True)
+    remarks: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
 
     transfer: Mapped["StockTransfer"] = relationship(
         "StockTransfer",
         back_populates="reconciliation",
     )
 
-    # Approval history is audit data: it is never cascade-deleted. With
-    # passive_deletes="all" the ORM leaves the rows alone and the
-    # ON DELETE RESTRICT foreign key blocks deleting a log that has history.
     approvals: Mapped[list["ReconciliationApproval"]] = relationship(
         "ReconciliationApproval",
         back_populates="reconciliation",
@@ -416,12 +478,7 @@ class ReconciliationLog(Base, TimestampMixin):
 
 
 class ReconciliationApproval(Base, TimestampMixin):
-    """Append-only approval history for a reconciliation.
-
-    A ReconciliationLog.resolution_status of RESOLVED is only a state
-    flag. This table is the audit proof of who decided, what they
-    decided, when, and why.
-    """
+    """Append-only approval history for a reconciliation."""
 
     __tablename__ = "reconciliation_approvals"
 
@@ -443,7 +500,6 @@ class ReconciliationApproval(Base, TimestampMixin):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
 
-    # Audit rows must never disappear silently with their parents.
     transfer_id: Mapped[str] = mapped_column(
         ForeignKey("stock_transfers.id", ondelete="RESTRICT"),
         nullable=False,
@@ -454,12 +510,20 @@ class ReconciliationApproval(Base, TimestampMixin):
         nullable=False,
     )
 
-    approver: Mapped[str] = mapped_column(String(100), nullable=False)
+    approver: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+    )
 
-    # APPROVED or REJECTED
-    decision: Mapped[str] = mapped_column(String(20), nullable=False)
+    decision: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+    )
 
-    remarks: Mapped[str | None] = mapped_column(Text, nullable=True)
+    remarks: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
 
     decided_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -470,6 +534,62 @@ class ReconciliationApproval(Base, TimestampMixin):
     reconciliation: Mapped["ReconciliationLog"] = relationship(
         "ReconciliationLog",
         back_populates="approvals",
+    )
+
+
+class InTransitLog(Base, TimestampMixin):
+    """Auditable record of stock-transfer events."""
+
+    __tablename__ = "in_transit_logs"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "idempotency_key",
+            name="uq_in_transit_logs_idempotency_key",
+        ),
+        Index(
+            "ix_in_transit_logs_transfer_id",
+            "transfer_id",
+        ),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+
+    transfer_id: Mapped[str] = mapped_column(
+        ForeignKey("stock_transfers.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+
+    event_type: Mapped[str] = mapped_column(
+        String(40),
+        nullable=False,
+    )
+
+    quantity: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
+
+    actor: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+    )
+
+    idempotency_key: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+    )
+
+    details: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    occurred_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utc_now,
+        nullable=False,
     )
 
 
