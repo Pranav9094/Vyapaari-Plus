@@ -18,66 +18,66 @@
   - PR #7 (`Murali6383`): Stock transfer tracking API
   - PR #8 (`gayatridoke774-commits`): Transfer engine documentation
   - PR #9 (`nairjaanvi199-creator`): Merchant acquisition playbook
-- [ ] Installing dependencies in `.venv` (in progress)
-- [ ] Baseline test run & migration check
+- [x] Installing dependencies in `.venv`
+- [x] Baseline test run & migration check
 
 ---
 ## Phase B: Codebase Audit & Bug Inventory
-- [ ] Static analysis, linting, and compile checks
-- [ ] Module-by-module audit
-- [ ] Deliverable: `docs/audit/AUDIT_REPORT.md`
+- [x] Static analysis, linting, and compile checks
+- [x] Module-by-module audit
+- [x] Deliverable: `docs/audit/AUDIT_REPORT.md`
 
 ---
 ## Phase C: High-Priority Bug Fixes
-- [ ] DB initialization and startup fixes
-- [ ] Stock quantities, negative stock, idempotency
-- [ ] Decimal money calculation and rounding policy
-- [ ] Customer balances, supplier payables, PO totals
-- [ ] Atomic stock transfers and rollback guarantees
+- [x] DB initialization and startup fixes
+- [x] Stock quantities, negative stock, idempotency
+- [x] Decimal money calculation and rounding policy
+- [ ] Customer balances, supplier payables, PO totals (supplier/PO verified; customer ledger remains stubbed)
+- [x] Atomic stock transfers and rollback guarantees
 
 ---
 ## Phase D: GST Implementation Review
-- [ ] CGST/SGST/IGST tax splits and odd-paise rules
-- [ ] Place of supply & 15-character GSTIN validation with state code rules
-- [ ] Round-off, discounts before tax, inclusive/exclusive pricing
-- [ ] Reverse charge handling
-- [ ] Credit / Debit note validations and reversals
-- [ ] E-Invoice (IRN) schema compliance
-- [ ] E-Way bill generation and threshold validations
-- [ ] QR code generation & missing lib handling
-- [ ] Invoice sequential numbering & FY reset
+- [x] CGST/SGST/IGST tax splits and odd-paise rules
+- [x] Place of supply & 15-character GSTIN validation with state code rules
+- [x] Round-off, discounts before tax, inclusive/exclusive pricing
+- [x] Reverse charge handling
+- [x] Credit / Debit note validations and reversals
+- [x] E-Invoice (IRN) schema compliance
+- [x] E-Way bill generation and threshold validations
+- [x] QR code generation & missing lib handling
+- [ ] Invoice sequential numbering & FY reset (billing module remains stubbed)
 
 ---
 ## Phase E: Multi-Store Inventory & Supplier Workflows
-- [ ] Idempotency & state machine validation
-- [ ] Stock conservation invariant: dispatch source decrement = receipt destination increment
+- [x] Idempotency & state machine validation
+- [x] Stock conservation invariant: dispatch source decrement = receipt destination increment
 - [ ] Discrepancy reconciliation (damaged, missing, excess)
 - [ ] Supplier PO -> Goods Receipt (GRN) -> Payables lifecycle
-- [ ] Transaction failure injection and rollback verification
+- [x] Transaction failure injection and rollback verification
 
 ---
 ## Phase F: Incomplete Functionality Completion
-- [ ] Business setup & configuration
-- [ ] POS Billing & cart management
-- [ ] Customer Udhaar ledger operations
-- [ ] Operational alerts (low stock, expiry, overdue Udhaar/payables)
+- [ ] Business setup & configuration (module remains a stub)
+- [ ] POS Billing & cart management (module remains a stub)
+- [ ] Customer Udhaar ledger operations (module remains a stub)
+- [ ] Operational alerts (not implemented)
 
 ---
 ## Phase G: Full Integration & Regression Testing
-- [ ] End-to-end integration workflows (`tests/integration/`)
-- [ ] Clean DB migration and boot verification
+- [x] End-to-end core workflows (GST, purchasing, and inventory regression coverage)
+- [x] Clean DB migration and boot verification
 - [ ] Export validation (PDF & Excel data parity)
-- [ ] Coverage assessment and test hardening
+- [x] Coverage assessment and test hardening
 
 ---
 ## Phase H: README.md Overhaul
-- [ ] Document verified features
-- [ ] Accurate architecture and setup guides
-- [ ] Verified commands for Desktop UI, API, and test suite
+- [x] Document verified features
+- [x] Accurate architecture and setup guides
+- [x] Verified commands for Desktop UI, API, and test suite
 
 ---
 ## Phase I & J: Repository Hygiene, Pull Request & Submission
-- [ ] .gitignore verification
+- [x] .gitignore verification
 - [ ] Clean git diff vs upstream/main
 - [ ] PR Body generation (`docs/audit/PR_BODY.md`)
 - [ ] Autonomous Pull Request creation

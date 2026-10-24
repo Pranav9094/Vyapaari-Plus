@@ -59,12 +59,29 @@ A comprehensive architectural and code-level audit of the Vyapaari+ repository w
 
 | Module | Priority | Missing Components | Impact | Plan |
 |---|---|---|---|---|
-| `app/modules/business/` | High | Models, Repository, Service for store profile & business info. | Unable to customize store name, address, GSTIN on invoices. | Implement full business entity and multi-branch settings. |
-| `app/modules/products/` | High | Product catalog search, category filtering, barcode lookup. | Only basic CRUD exists; no barcode search or category hierarchy. | Add category support, barcode lookup, active product filters. |
-| `app/modules/customers/` | High | Customer profile, Udhaar ledger, payments, credit limits. | Indian MSMEs rely heavily on customer credit (Udhaar). | Implement complete Udhaar ledger with balance tracking and settlement. |
-| `app/modules/billing/` | High | POS cart, discounts, GST breakdown, split payment modes. | Core BOS functionality non-operational. | Implement full POS billing engine connected to GST calculation and stock decrements. |
-| `app/modules/reports/` | Medium | Sales summary, stock valuation, PDF invoice export, Excel export. | Retailers cannot export tax reports or print invoices. | Build report generation with ReportLab & OpenPyXL. |
-| `app/modules/auth/` | Medium | User authentication, RBAC roles, secure login. | App operates with implicit permissions. | Implement user authentication models and session verification. |
+| `app/modules/business/` | High | Models, Repository, and Service are scaffolds. | Store profile and branch configuration are not available. | Implement the business entity and multi-branch settings. |
+| `app/modules/products/` | Medium | Basic CRUD exists; search, category filtering, and barcode lookup are incomplete. | Catalog workflows are limited. | Add catalog query and barcode capabilities. |
+| `app/modules/customers/` | High | Models, Repository, and Service are scaffolds. | Udhaar balances, limits, and settlement are unavailable. | Implement the customer ledger and payment workflow. |
+| `app/modules/billing/` | High | Models, Repository, and Service are scaffolds. | POS checkout and invoice numbering are unavailable. | Implement atomic POS billing connected to GST and stock. |
+| `app/modules/reports/` | Medium | Models, Repository, and Service are scaffolds. | PDF and Excel exports are unavailable. | Implement report generation and parity tests. |
+| `app/modules/auth/` | Medium | Model, Repository, and Service are scaffolds. | Authentication and RBAC are not wired into the API/UI. | Implement authentication and permission enforcement. |
+
+The previous draft of this report incorrectly marked these scaffolded items as fixed.
+This audit pass corrects their status rather than claiming unverified functionality.
+
+## 6. Verification Update
+
+- `python -m pytest -q --cov=app --cov-report=term-missing`: 514 passed, 84% total coverage.
+- `python -m compileall -q app migrations tests`: passed.
+- `DATABASE_URL=sqlite:///clean-audit-check.db python -m alembic upgrade head`: passed
+  through revision `7a2f6e1c4b90`.
+- Importing all application models followed by `init_db()` initializes the clean database
+  successfully; `python -m app.main` then starts the desktop event loop when Qt is
+  installed (or returns in headless environments).
+- `uvicorn app.api:app --host 127.0.0.1 --port 8000` imports the API application successfully.
+- Open upstream PR overlap remains limited to inventory transfer changes in PRs #4, #6,
+  and #7; this branch preserves their route contracts while adding Decimal persistence
+  and API idempotency-key wiring.
 
 ---
 

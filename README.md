@@ -212,6 +212,54 @@ gantt
 
 ---
 
+## ✅ Verified Current Implementation
+
+The current branch verifies the GST calculation and validation engine, supplier purchase
+order/GRN workflows, product catalog services, and multi-branch inventory transfer
+workflow (dispatch, transit, receipt, reconciliation, cancellation, Decimal money
+handling, and idempotency). Business setup, POS billing, customer Udhaar, reporting
+exports, and operational alerts are scaffolded but are not yet production-ready.
+
+### Prerequisites and setup
+
+Python 3.12 or newer is required on Windows.
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+Copy-Item .env.example .env
+python -m alembic upgrade head
+```
+
+The default database is the local `vyapaari.db` SQLite file. Set `DATABASE_URL` in
+`.env` to use another SQLite URL. Do not put production secrets in `.env.example`.
+
+### Run the application and API
+
+```powershell
+python -m app.main
+uvicorn app.api:app --host 127.0.0.1 --port 8000
+```
+
+The desktop command initializes the database and exits cleanly in headless environments.
+The API exposes `/health` and the inventory transfer routes.
+
+### Tests and coverage
+
+```powershell
+python -m pytest -q
+python -m pytest -q tests\unit\gst
+python -m pytest -q tests\unit\test_stock_transfer.py
+python -m pytest -q --cov=app --cov-report=term-missing
+```
+
+### Known limitations and roadmap
+
+The `business`, `billing`, `customers`, `reports`, and alert modules currently contain
+interfaces or scaffolding rather than complete user workflows. Completing those
+services and wiring their desktop/API surfaces is the next roadmap phase.
+
 ## 🛠️ Contribution & PR Workflow
 
 We welcome contributions to Vyapaari+! Please follow our feature branch workflow:
