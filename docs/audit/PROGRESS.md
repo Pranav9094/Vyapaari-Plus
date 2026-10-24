@@ -1,8 +1,8 @@
 # Vyapaari+ Sprint Audit Progress Log
 
-**Sprint Window**: 48 Hours  
-**Assignee**: Mansi Agrawal (Lead Assignee / Permanent Intern ID TTI000066)  
-**Branch**: `sprint/audit-fixes-integration`  
+**Sprint Window**: 48 Hours
+**Assignee**: Mansi Agrawal (Lead Assignee / Permanent Intern ID TTI000066)
+**Branch**: `sprint/audit-fixes-integration`
 **Base**: `upstream/main` (`mohitraj8503/Vyapaari-Plus`)
 
 ---

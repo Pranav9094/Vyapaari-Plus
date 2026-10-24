@@ -1,10 +1,10 @@
 # Vyapaari+ Codebase Audit & Architectural Review
 
-**Sprint**: 48-Hour Technical Ownership Sprint  
-**Lead Assignee**: Mansi Agrawal (Permanent Intern ID: TTI000066)  
-**Branch**: `sprint/audit-fixes-integration`  
-**Base**: `upstream/main` (`mohitraj8503/Vyapaari-Plus`)  
-**Audit Date**: October 2026  
+**Sprint**: 48-Hour Technical Ownership Sprint
+**Lead Assignee**: Mansi Agrawal (Permanent Intern ID: TTI000066)
+**Branch**: `sprint/audit-fixes-integration`
+**Base**: `upstream/main` (`mohitraj8503/Vyapaari-Plus`)
+**Audit Date**: October 2026
 
 ---
 
