@@ -68,23 +68,25 @@ A comprehensive architectural and code-level audit of the Vyapaari+ repository w
 
 The previous draft of this report incorrectly marked these scaffolded items as fixed.
 This sprint completed the business, billing, customer ledger, report export, and alert
-services listed above, with regression coverage in `tests/unit/test_phase_f_core.py` and
-`tests/unit/test_phase_f_services.py`. Authentication and RBAC are now available through
+services listed above, with regression coverage in `tests/unit/test_phase_f_core.py`,
+`tests/unit/test_phase_f_services.py`, and `tests/unit/test_phase_f_coverage.py`.
+Authentication and RBAC are now available through
 the API auth endpoints and permission dependencies.
 
 ## 6. Verification Update
 
-- `python -m pytest -q --cov=app --cov-report=term-missing`: 519 passed, 83% total coverage.
+- `python -m pytest -q --cov=app --cov-report=term-missing`: 531 passed, 89% total coverage.
 - `python -m compileall -q app migrations tests`: passed.
 - `DATABASE_URL=sqlite:///clean-audit-check.db python -m alembic upgrade head`: passed
-  through revision `7a2f6e1c4b90`.
+  through revision `8c3d7e1a4b20`.
 - Importing all application models followed by `init_db()` initializes the clean database
   successfully; `python -m app.main` then starts the desktop event loop when Qt is
   installed (or returns in headless environments).
 - `uvicorn app.api:app --host 127.0.0.1 --port 8000` imports the API application successfully.
-- Phase F services are covered by 5 focused tests: business profile validation, atomic
-  idempotent billing, Udhaar balance invariants, role permissions, alerts, and empty
-  Excel export.
+- Phase F services have focused coverage for business validation, intra/inter-state GST,
+  discounts, round-off, split payments, invoice sequencing, idempotency, rollback,
+  Udhaar limits/payments/reversals/invariants, role permission matrices, invalid tokens,
+  export parity and empty data, all alert categories, and API permission dependencies.
 - Open upstream PR overlap remains limited to inventory transfer changes in PRs #4, #6,
   and #7; this branch preserves their route contracts while adding Decimal persistence
   and API idempotency-key wiring.

@@ -68,6 +68,7 @@
 - [x] Clean DB migration and boot verification
 - [x] Export validation (PDF & Excel data parity)
 - [x] Coverage assessment and test hardening
+- [x] Phase F boundary, failure, permission, export, and alert regression coverage
 
 ---
 ## Phase H: README.md Overhaul

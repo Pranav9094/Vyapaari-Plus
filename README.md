@@ -243,7 +243,8 @@ uvicorn app.api:app --host 127.0.0.1 --port 8000
 ```
 
 The desktop command initializes the database and exits cleanly in headless environments.
-The API exposes `/health` and the inventory transfer routes.
+The API exposes `/health`, authentication, business setup, billing, alerts, reports,
+customer payment, and inventory transfer routes.
 
 ### Tests and coverage
 
@@ -251,8 +252,13 @@ The API exposes `/health` and the inventory transfer routes.
 python -m pytest -q
 python -m pytest -q tests\unit\gst
 python -m pytest -q tests\unit\test_stock_transfer.py
+python -m pytest -q tests\unit\test_phase_f_core.py tests\unit\test_phase_f_services.py tests\unit\test_phase_f_coverage.py
 python -m pytest -q --cov=app --cov-report=term-missing
 ```
+
+The latest verification run passes 531 tests with 89% total application coverage.
+The focused Phase F service modules are covered at 97% combined, with each substantive
+new module above 90%.
 
 ### Known limitations and roadmap
 

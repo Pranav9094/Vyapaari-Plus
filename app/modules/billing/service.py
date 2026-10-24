@@ -55,10 +55,17 @@ class BillingService:
         tax_total = Decimal("0.00")
         try:
             for raw in items:
-                product = self.db.get(Product, raw["product_id"])
-                quantity = int(raw["quantity"])
+                product = self.db.get(Product, raw.get("product_id"))
+                try:
+                    quantity = int(raw.get("quantity", 0))
+                except (TypeError, ValueError):
+                    raise ValidationError(
+                        "Each bill line needs a valid positive quantity and product."
+                    ) from None
                 if product is None or quantity <= 0:
-                    raise ValidationError("Each bill line needs a valid positive quantity and product.")
+                    raise ValidationError(
+                        "Each bill line needs a valid positive quantity and product."
+                    )
                 if product.current_stock < quantity:
                     raise InsufficientStockError(product.id, product.current_stock, quantity)
                 unit_price = to_decimal(raw.get("unit_price", product.unit_cost), "unit_price")
@@ -78,7 +85,33 @@ class BillingService:
             bill_discount = to_decimal(bill_discount, "bill_discount")
             if bill_discount < 0 or bill_discount > taxable_total:
                 raise ValidationError("Bill discount is outside the taxable total.")
-            taxable_total = round_paise(taxable_total - bill_discount)
+            if bill_discount:
+                original_taxable = taxable_total
+                adjusted_lines = []
+                remaining_discount = bill_discount
+                for index, (product, item, tax) in enumerate(line_results):
+                    if index == len(line_results) - 1:
+                        allocation = remaining_discount
+                    else:
+                        allocation = round_paise(
+                            bill_discount * tax.taxable_value / original_taxable
+                        )
+                        remaining_discount -= allocation
+                    adjusted_item = item.model_copy(
+                        update={"discount": item.discount + allocation}
+                    )
+                    adjusted_tax = calculate_line(adjusted_item, regime)
+                    adjusted_lines.append((product, adjusted_item, adjusted_tax))
+                line_results = adjusted_lines
+                tax_total = sum(
+                    (tax.cgst + tax.sgst + tax.igst + tax.cess for _, _, tax in line_results),
+                    Decimal("0.00"),
+                )
+                taxable_total = sum(
+                    (tax.taxable_value for _, _, tax in line_results),
+                    Decimal("0.00"),
+                )
+            taxable_total = round_paise(taxable_total)
             total_before_round = taxable_total + tax_total
             total, adjustment = round_off(total_before_round)
             invoice = SalesInvoice(

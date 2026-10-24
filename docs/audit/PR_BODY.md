@@ -29,10 +29,13 @@ the resulting invoice round-off.
 
 ## Tests
 
-- Full suite: 519 passed.
-- Coverage: 83% for `app`.
+- Full suite: 531 passed.
+- Coverage: 89% for `app`; Phase F service modules: 97% combined.
+- Added comprehensive Phase F regression coverage for GST regimes, discounts, round-off,
+  split payments, invoice sequencing, rollback, Udhaar invariants, RBAC matrices,
+  exports, empty data, business validation, and every alert category.
 - `compileall`: passed.
-- Clean SQLite Alembic upgrade: passed through `7a2f6e1c4b90`.
+- Clean SQLite Alembic upgrade: passed through `8c3d7e1a4b20`.
 - Full model registration/database initialization and API import smoke checks: passed.
 
 ## Documentation
