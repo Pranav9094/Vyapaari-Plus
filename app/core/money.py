@@ -7,16 +7,16 @@ Policy:
 - Round-off policy: Invoices round to nearest whole rupee with explicit round-off adjustment line.
 """
 
-from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 from typing import Any
 
 from app.core.exceptions import ValidationError
 
 PAISE = Decimal("0.01")
-RUPEE = Decimal("1")
-HUNDRED = Decimal("100")
+RUPEE = Decimal(1)
+HUNDRED = Decimal(100)
 ZERO = Decimal("0.00")
-TWO = Decimal("2")
+TWO = Decimal(2)
 
 
 def to_decimal(value: Any, field: str = "value") -> Decimal:

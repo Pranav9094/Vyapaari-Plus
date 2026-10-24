@@ -39,6 +39,7 @@ class CreateTransferInput(BaseModel):
     items: list[TransferItemInput] = Field(min_length=1)
     dispatched_by: str | None = None
     notes: str | None = None
+    idempotency_key: str | None = Field(default=None, min_length=1, max_length=100)
 
 
 class DispatchInput(BaseModel):
@@ -105,6 +106,7 @@ def create_transfer(payload: CreateTransferInput, db: Session = Depends(get_db))
             items=[item.model_dump() for item in payload.items],
             dispatched_by=payload.dispatched_by,
             notes=payload.notes,
+            idempotency_key=payload.idempotency_key,
         )
         return to_dict(transfer)
     except (EntityNotFoundError, ValidationError, InsufficientStockError) as exc:
