@@ -1,7 +1,7 @@
 ## Summary
 
-This PR completes the repository audit and hardens the GST and multi-branch inventory
-paths without claiming unfinished business workflows are complete.
+This PR completes the repository audit, hardens GST and multi-branch inventory, and
+implements the previously scaffolded Phase F service workflows.
 
 ## Bugs fixed
 
@@ -18,6 +18,9 @@ paths without claiming unfinished business workflows are complete.
 - Added failure-injection rollback coverage.
 - Exposed `idempotency_key` through the transfer API.
 - Added Alembic revision `7a2f6e1c4b90` for money-field and idempotency schema changes.
+- Added Alembic revision `8c3d7e1a4b20` for business, billing, and customer ledger tables.
+- Implemented business profiles, POS billing, invoice sequencing, Udhaar ledger, exports,
+  authentication/RBAC, API wiring, and operational alerts.
 
 ## GST changes
 
@@ -26,8 +29,8 @@ the resulting invoice round-off.
 
 ## Tests
 
-- Full suite: 514 passed.
-- Coverage: 84% for `app`.
+- Full suite: 519 passed.
+- Coverage: 83% for `app`.
 - `compileall`: passed.
 - Clean SQLite Alembic upgrade: passed through `7a2f6e1c4b90`.
 - Full model registration/database initialization and API import smoke checks: passed.
@@ -39,8 +42,8 @@ The audit report and progress log document the remaining scaffolded modules.
 
 ## Known limitations
 
-Business setup, POS billing, customer Udhaar, reports/exports, authentication wiring, and
-operational alerts remain incomplete and are explicitly marked as such in the audit.
+The desktop UI is a service-status shell rather than a full data-entry experience; the
+API and service layer are complete for the Phase F workflows.
 
 ## Conflict notes
 

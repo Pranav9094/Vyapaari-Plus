@@ -215,10 +215,10 @@ gantt
 ## ✅ Verified Current Implementation
 
 The current branch verifies the GST calculation and validation engine, supplier purchase
-order/GRN workflows, product catalog services, and multi-branch inventory transfer
-workflow (dispatch, transit, receipt, reconciliation, cancellation, Decimal money
-handling, and idempotency). Business setup, POS billing, customer Udhaar, reporting
-exports, and operational alerts are scaffolded but are not yet production-ready.
+order/GRN workflows, product catalog services, multi-branch inventory transfer workflow,
+business setup, POS billing, customer Udhaar, report exports, authentication/RBAC, and
+operational alerts. Billing and ledger services use Decimal money values and atomic
+transactions.
 
 ### Prerequisites and setup
 
@@ -256,9 +256,8 @@ python -m pytest -q --cov=app --cov-report=term-missing
 
 ### Known limitations and roadmap
 
-The `business`, `billing`, `customers`, `reports`, and alert modules currently contain
-interfaces or scaffolding rather than complete user workflows. Completing those
-services and wiring their desktop/API surfaces is the next roadmap phase.
+The desktop screens remain intentionally lightweight and route to the implemented service
+layer; production deployment still requires configuring secrets and a business profile.
 
 ## 🛠️ Contribution & PR Workflow
 

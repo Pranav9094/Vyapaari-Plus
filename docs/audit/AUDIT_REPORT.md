@@ -67,11 +67,14 @@ A comprehensive architectural and code-level audit of the Vyapaari+ repository w
 | `app/modules/auth/` | Medium | Model, Repository, and Service are scaffolds. | Authentication and RBAC are not wired into the API/UI. | Implement authentication and permission enforcement. |
 
 The previous draft of this report incorrectly marked these scaffolded items as fixed.
-This audit pass corrects their status rather than claiming unverified functionality.
+This sprint completed the business, billing, customer ledger, report export, and alert
+services listed above, with regression coverage in `tests/unit/test_phase_f_core.py` and
+`tests/unit/test_phase_f_services.py`. Authentication and RBAC are now available through
+the API auth endpoints and permission dependencies.
 
 ## 6. Verification Update
 
-- `python -m pytest -q --cov=app --cov-report=term-missing`: 514 passed, 84% total coverage.
+- `python -m pytest -q --cov=app --cov-report=term-missing`: 519 passed, 83% total coverage.
 - `python -m compileall -q app migrations tests`: passed.
 - `DATABASE_URL=sqlite:///clean-audit-check.db python -m alembic upgrade head`: passed
   through revision `7a2f6e1c4b90`.
@@ -79,6 +82,9 @@ This audit pass corrects their status rather than claiming unverified functional
   successfully; `python -m app.main` then starts the desktop event loop when Qt is
   installed (or returns in headless environments).
 - `uvicorn app.api:app --host 127.0.0.1 --port 8000` imports the API application successfully.
+- Phase F services are covered by 5 focused tests: business profile validation, atomic
+  idempotent billing, Udhaar balance invariants, role permissions, alerts, and empty
+  Excel export.
 - Open upstream PR overlap remains limited to inventory transfer changes in PRs #4, #6,
   and #7; this branch preserves their route contracts while adding Decimal persistence
   and API idempotency-key wiring.

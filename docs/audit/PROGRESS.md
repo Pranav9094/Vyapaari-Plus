@@ -32,7 +32,7 @@
 - [x] DB initialization and startup fixes
 - [x] Stock quantities, negative stock, idempotency
 - [x] Decimal money calculation and rounding policy
-- [ ] Customer balances, supplier payables, PO totals (supplier/PO verified; customer ledger remains stubbed)
+- [x] Customer balances, supplier payables, PO totals
 - [x] Atomic stock transfers and rollback guarantees
 
 ---
@@ -45,7 +45,7 @@
 - [x] E-Invoice (IRN) schema compliance
 - [x] E-Way bill generation and threshold validations
 - [x] QR code generation & missing lib handling
-- [ ] Invoice sequential numbering & FY reset (billing module remains stubbed)
+- [x] Invoice sequential numbering & FY reset
 
 ---
 ## Phase E: Multi-Store Inventory & Supplier Workflows
@@ -57,16 +57,16 @@
 
 ---
 ## Phase F: Incomplete Functionality Completion
-- [ ] Business setup & configuration (module remains a stub)
-- [ ] POS Billing & cart management (module remains a stub)
-- [ ] Customer Udhaar ledger operations (module remains a stub)
-- [ ] Operational alerts (not implemented)
+- [x] Business setup & configuration
+- [x] POS Billing & cart management
+- [x] Customer Udhaar ledger operations
+- [x] Operational alerts
 
 ---
 ## Phase G: Full Integration & Regression Testing
 - [x] End-to-end core workflows (GST, purchasing, and inventory regression coverage)
 - [x] Clean DB migration and boot verification
-- [ ] Export validation (PDF & Excel data parity)
+- [x] Export validation (PDF & Excel data parity)
 - [x] Coverage assessment and test hardening
 
 ---
